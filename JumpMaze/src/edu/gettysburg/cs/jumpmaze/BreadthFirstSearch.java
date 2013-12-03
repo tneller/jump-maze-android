@@ -45,7 +45,7 @@ public class BreadthFirstSearch {
 	//Given:Maze                a maze with jump values
 	//Return:int                Returns the length of the shortest path from starting position to the goal
 	public static int getShortestPath(Node[][] maze){
-		LegalMoves.allLegalMoves(maze);
+		//LegalMoves.allLegalMoves(maze);
 		Node goalNode = bfs(maze); //calls bfs to set up the path
 		//if the goal node was never reached
 		if(goalNode.color == 1){

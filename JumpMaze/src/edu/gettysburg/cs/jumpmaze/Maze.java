@@ -19,26 +19,6 @@ public class Maze extends Application{
 	public void onCreate() {
 		c = getApplicationContext();
 	}
-	
-	/**
-	 * I am still getting this error, I have no idea how to fix it. I have tried running the same method in a different project, that is not an android application and it works.
-	 * I made some adaptations to hopefully get to to be running, but nothing that I do allows me to get past this error.
-	 *         #
-                # A fatal error has been detected by the Java Runtime Environment:
-                #
-                #  Internal Error (classFileParser.cpp:3494), pid=19421, tid=139778025043712
-                #  Error: ShouldNotReachHere()
-                #
-                # JRE version: 6.0_25-b06
-                # Java VM: Java HotSpot(TM) 64-Bit Server VM (20.0-b11 mixed mode linux-amd64 compressed oops)
-                # An error report file with more information is saved as:
-                # /Accounts/turing/students/s15/brader01/git/Jump Maze/JumpMaze2/hs_err_pid19421.log
-                #
-                # If you would like to submit a bug report, please visit:
-                #   http://java.sun.com/webapps/bugreport/crash.jsp
-                #
-	 *
-	 */
 
 	//Code gotten from http://stackoverflow.com/questions/14801876/android-accessing-file-from-internal-storage-using-randomaccessfile
 	//used to access a file
@@ -97,6 +77,7 @@ public class Maze extends Application{
 			}
 		}
 		raf.close();
+		LegalMoves.allLegalMoves(maze);
 		player = maze[0][0];
 		player.visited = true;
 		return maze;

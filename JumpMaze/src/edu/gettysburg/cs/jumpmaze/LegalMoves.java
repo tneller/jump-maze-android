@@ -15,14 +15,18 @@ public class LegalMoves {
 				int nodeKey = node.key;
 				if (nodeKey == 0){
 					node.isGoal = true;
-				}else{
+				}
+				else{
 					if (i+nodeKey < 5){
 						node.legalMoves.add(maze[i + nodeKey][j]);
-					}if (j + nodeKey < 5){
+					}
+					if (j + nodeKey < 5){
 						node.legalMoves.add(maze[i][j + nodeKey]);
-					}if (i - nodeKey >= 0){
+					}
+					if (i - nodeKey >= 0){
 						node.legalMoves.add(maze[i - nodeKey][j]);
-					}if (j - nodeKey >= 0){
+					}
+					if (j - nodeKey >= 0){
 						node.legalMoves.add(maze[i][j - nodeKey]);
 					}
 				}

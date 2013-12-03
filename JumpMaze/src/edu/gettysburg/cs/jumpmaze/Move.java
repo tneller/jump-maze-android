@@ -63,8 +63,7 @@ public class Move {
 	//Given:Maze                a maze with jump values
 	//Return:void
 	public void reset(){        
-		player.rowPos = 0;
-		player.colPos = 0;
+		player = maze[0][0];
 		for(int i = 0; i < 5; i++){
 			for(int j = 0; j < 5; j++){
 				maze[i][j].visited = false;
