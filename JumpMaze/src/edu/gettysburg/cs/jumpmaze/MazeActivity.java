@@ -12,6 +12,7 @@ import android.view.Menu;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
+import android.widget.TextView;
 import android.widget.Toast;
 
 public class MazeActivity extends Activity {
@@ -49,6 +50,16 @@ public class MazeActivity extends Activity {
 	 * A button that moves on to the next maze
 	 */
 	private ImageButton nextMazeButton;
+	
+	/**
+	 * TextView that keeps track of the number of moves
+	 */
+	TextView moveView;
+	
+	/**
+	 * variable that keeps track of number of moves
+	 */
+	int moves;
 
 	
 	@Override
@@ -78,7 +89,9 @@ public class MazeActivity extends Activity {
 			public void onClick(View v) {
 				game.reset();
             	playerNode = game.player;
-            	drawMaze();				
+            	drawMaze();
+            	moves = game.count;
+        		moveView.setText("Moves: " + moves);
 			}
 		});
 		
@@ -86,10 +99,12 @@ public class MazeActivity extends Activity {
 			public void onClick(View v) {
 				makeNewMaze();
                 game = new Move(currentMaze, currentMaze[0][0]);
+                moves = game.count;
+        		moveView.setText("Moves: " + moves);
 			}
 		});
 		
-
+		moveView = (TextView) findViewById(R.id.moves);
 	}
 	
 	private void makeMove(int row, int col)
@@ -102,21 +117,35 @@ public class MazeActivity extends Activity {
 		}
 		else
 		{
-			Toast.makeText(MazeActivity.this, "RAWR! I AM LORD OF ERRORS!", Toast.LENGTH_SHORT).show();
+			Toast.makeText(MazeActivity.this, "Invalid Move", Toast.LENGTH_SHORT).show();
 		}
 		
 		playerNode = game.player;
+		
+		moves = game.count;
+		
+		moveView.setText("Moves: " + moves);
 		
 		drawMaze();
 		
 		if(game.isFinished())
 		{
 			AlertDialog.Builder won = new AlertDialog.Builder(MazeActivity.this);
-			won.setMessage("You won!");
+			int shortest = BreadthFirstSearch.getShortestPath(currentMaze);
+			if(moves != shortest)
+			{
+				won.setMessage("You solved the puzzle in " + moves + " moves. The shortest route was " + shortest +".");
+			}
+			else
+			{
+				won.setMessage("You solved the puzzle in " + moves + " moves. That is the shortest route! Good job!");
+			}
 			won.setPositiveButton("Next Maze", new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface dialog, int id) {
                     makeNewMaze();
                     game = new Move(currentMaze, currentMaze[0][0]);
+                    moves = game.count;
+            		moveView.setText("Moves: " + moves);
                 }
             });
 			won.setNegativeButton("Retry", new DialogInterface.OnClickListener() {
@@ -124,6 +153,8 @@ public class MazeActivity extends Activity {
                 	game.reset();
                 	playerNode = game.player;
                 	drawMaze();
+                	moves = game.count;
+            		moveView.setText("Moves: " + moves);
                 }
             });
 			won.create();
