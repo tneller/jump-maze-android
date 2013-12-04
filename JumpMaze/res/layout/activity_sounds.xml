@@ -25,10 +25,4 @@
         android:layout_height="wrap_content"
         android:text="@string/sounds_effects" />
 
-    <Button
-        android:id="@+id/back_to_maze"
-        android:layout_width="110dp"
-        android:layout_height="wrap_content"
-        android:text="@string/apply" />
-
 </LinearLayout>

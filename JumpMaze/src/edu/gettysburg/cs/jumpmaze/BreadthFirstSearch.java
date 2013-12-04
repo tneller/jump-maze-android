@@ -14,7 +14,7 @@ public class BreadthFirstSearch {
 		for(int i = 0; i < 5; i++){
 			for(int j = 0; j < 5; j++){
 				Node node = maze[i][j];
-				node.color = 0;
+				node.color = 1;
 				node.parent = null;
 				if(node.isGoal){
 					goalNode = node;

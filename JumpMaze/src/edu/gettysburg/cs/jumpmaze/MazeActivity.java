@@ -5,6 +5,7 @@ import java.io.IOException;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
@@ -30,38 +31,49 @@ public class MazeActivity extends Activity {
 	 * 2D array that holds the numbers for the maze.
 	 */
 	private Node[][] currentMaze;
-	
+
 	/**
 	 * A variable that keeps track of the players progress and moves in current game
 	 */
 	private Move game;
-	
+
 	/**
 	 * keeps track of the current node the player is on
 	 */
 	private Node playerNode;
-	
+
 	/**
 	 * A button that resets the current maze
 	 */
 	private ImageButton resetButton;
-	
+
+
+	/**
+	 * A button that goes back to home page
+	 */
+	private ImageButton homeButton;
+
 	/**
 	 * A button that moves on to the next maze
 	 */
 	private ImageButton nextMazeButton;
-	
+
+	/**
+	 * A button that moves on to sound settings
+	 */
+	private ImageButton soundButton;
+
 	/**
 	 * TextView that keeps track of the number of moves
 	 */
 	TextView moveView;
-	
+
 	/**
 	 * variable that keeps track of number of moves
 	 */
 	int moves;
 
-	
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -81,36 +93,87 @@ public class MazeActivity extends Activity {
 		makeNewMaze();
 
 		game = new Move(currentMaze, currentMaze[0][0] );
-		
+
 		resetButton = (ImageButton) findViewById(R.id.reset_maze);
 		nextMazeButton = (ImageButton) findViewById(R.id.next_maze_button);
-		
+		homeButton = (ImageButton) findViewById(R.id.home_button);
+		soundButton = (ImageButton) findViewById(R.id.sound_button);
+
+
+
 		resetButton.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
-				game.reset();
-            	playerNode = game.player;
-            	drawMaze();
-            	moves = game.count;
-        		moveView.setText("Moves: " + moves);
+				AlertDialog.Builder isSure = new AlertDialog.Builder(MazeActivity.this);
+				isSure.setMessage("Are you sure you want to reset the maze?");
+				isSure.setPositiveButton("Reset", new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int id) {
+						game.reset();
+						playerNode = game.player;
+						drawMaze();
+						moves = game.count;
+						moveView.setText("Moves: " + moves);
+					}
+				});
+				isSure.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int id) {  }
+				});
+				isSure.create();
+				isSure.show();
+
+
 			}
 		});
-		
+
+		homeButton.setOnClickListener(new View.OnClickListener() {
+			public void onClick(View v) {
+				toHomePage();
+			}
+		});
+
 		nextMazeButton.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
-				makeNewMaze();
-                game = new Move(currentMaze, currentMaze[0][0]);
-                moves = game.count;
-        		moveView.setText("Moves: " + moves);
+				AlertDialog.Builder isSure = new AlertDialog.Builder(MazeActivity.this);
+				isSure.setMessage("Are you sure you want a new maze?");
+				isSure.setPositiveButton("New Maze!", new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int id) {
+						makeNewMaze();
+						game = new Move(currentMaze, currentMaze[0][0]);
+						moves = game.count;
+						moveView.setText("Moves: " + moves);
+					}
+				});
+				isSure.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int id) {  }
+				});
+				isSure.create();
+				isSure.show();
+
+			}
+		});
+
+		soundButton.setOnClickListener(new View.OnClickListener() {
+			public void onClick(View v) {
+				toSoundPage();
 			}
 		});
 		
 		moveView = (TextView) findViewById(R.id.moves);
 	}
-	
+
+	private void toHomePage(){
+		Intent intent = new Intent(this, ActivitySplash.class);
+		startActivity(intent);
+	}
+
+	private void toSoundPage(){
+		Intent intent = new Intent(this, SoundActivity.class);
+		startActivity(intent);
+	}
+
 	private void makeMove(int row, int col)
 	{
 		boolean moved = game.movePlayer(row, col);
-		
+
 		if(moved)
 		{
 			Toast.makeText(MazeActivity.this, "Valid Move", Toast.LENGTH_SHORT).show();
@@ -119,15 +182,14 @@ public class MazeActivity extends Activity {
 		{
 			Toast.makeText(MazeActivity.this, "Invalid Move", Toast.LENGTH_SHORT).show();
 		}
-		
+
 		playerNode = game.player;
-		
 		moves = game.count;
-		
+
 		moveView.setText("Moves: " + moves);
-		
+
 		drawMaze();
-		
+
 		if(game.isFinished())
 		{
 			AlertDialog.Builder won = new AlertDialog.Builder(MazeActivity.this);
@@ -141,27 +203,27 @@ public class MazeActivity extends Activity {
 				won.setMessage("You solved the puzzle in " + moves + " moves. That is the shortest route! Good job!");
 			}
 			won.setPositiveButton("Next Maze", new DialogInterface.OnClickListener() {
-                public void onClick(DialogInterface dialog, int id) {
-                    makeNewMaze();
-                    game = new Move(currentMaze, currentMaze[0][0]);
-                    moves = game.count;
-            		moveView.setText("Moves: " + moves);
-                }
-            });
+				public void onClick(DialogInterface dialog, int id) {
+					makeNewMaze();
+					game = new Move(currentMaze, currentMaze[0][0]);
+					moves = game.count;
+					moveView.setText("Moves: " + moves);
+				}
+			});
 			won.setNegativeButton("Retry", new DialogInterface.OnClickListener() {
-                public void onClick(DialogInterface dialog, int id) {
-                	game.reset();
-                	playerNode = game.player;
-                	drawMaze();
-                	moves = game.count;
-            		moveView.setText("Moves: " + moves);
-                }
-            });
+				public void onClick(DialogInterface dialog, int id) {
+					game.reset();
+					playerNode = game.player;
+					drawMaze();
+					moves = game.count;
+					moveView.setText("Moves: " + moves);
+				}
+			});
 			won.create();
 			won.show();
 		}
-		
-		
+
+
 	}
 
 
@@ -199,81 +261,170 @@ public class MazeActivity extends Activity {
 			{
 				currNode = currentMaze[i][j];
 				currButton = buttons[i][j];
-				
-				if(currNode == playerNode)
-				{
-					if ((i+j) % 2 == 0) 
-					{
-						currButton.setBackgroundDrawable(getResources().getDrawable(R.drawable.selected_black));
-					}
-					else
-					{
-						currButton.setBackgroundDrawable(getResources().getDrawable(R.drawable.selected_gray));
-					}
-				}
-				else if(currNode.visited == true)
-				{
-					if ((i+j) % 2 == 0) 
-					{
-						currButton.setBackgroundDrawable(getResources().getDrawable(R.drawable.hint_black));
-					}
-					else
-					{
-						currButton.setBackgroundDrawable(getResources().getDrawable(R.drawable.hint_gray));
-					}
-				}
-				else
-				{
-					if ((i+j) % 2 == 0) 
-					{
-						currButton.setBackgroundDrawable(getResources().getDrawable(R.drawable.black));
-					}
-					else
-					{
-						currButton.setBackgroundDrawable(getResources().getDrawable(R.drawable.gray));
-					}
-				}
 
+				//1
 				if(currNode.key == 1)
 				{
-					currButton.setText("1");
-					currButton.setTextColor(Color.YELLOW);
-					currButton.setTextSize(getResources().getDimension(R.dimen.text_size));
+					if(currNode == playerNode)
+					{
+						if ((i+j) % 2 == 0) 
+						{
+							currButton.setBackgroundDrawable(getResources().getDrawable(R.drawable.selected_black_1));
+						}
+						else
+						{
+							currButton.setBackgroundDrawable(getResources().getDrawable(R.drawable.selected_gray_1));
+						}
+					}
+					else if(currNode.visited == true)
+					{
+						if ((i+j) % 2 == 0) 
+						{
+							currButton.setBackgroundDrawable(getResources().getDrawable(R.drawable.hint_black_1));
+						}
+						else
+						{
+							currButton.setBackgroundDrawable(getResources().getDrawable(R.drawable.hint_gray_1));
+						}
+					}
+					else
+					{
+						if ((i+j) % 2 == 0) https://github.com/tneller/jump-maze-android.git
+						{
+							currButton.setBackgroundDrawable(getResources().getDrawable(R.drawable.black_1));
+						}
+						else
+						{
+							currButton.setBackgroundDrawable(getResources().getDrawable(R.drawable.gray_1));
+						}
+					}
 				}
+				//2
 				else if(currNode.key == 2)
 				{
-					currButton.setText("2");
-					currButton.setTextColor(Color.rgb(255, 150, 0));
-					currButton.setTextSize(getResources().getDimension(R.dimen.text_size));
+					if(currNode == playerNode)
+					{
+						if ((i+j) % 2 == 0) 
+						{
+							currButton.setBackgroundDrawable(getResources().getDrawable(R.drawable.selected_black_2));
+						}
+						else
+						{
+							currButton.setBackgroundDrawable(getResources().getDrawable(R.drawable.selected_gray_2));
+						}
+					}
+					else if(currNode.visited == true)
+					{
+						if ((i+j) % 2 == 0) 
+						{
+							currButton.setBackgroundDrawable(getResources().getDrawable(R.drawable.hint_black_2));
+						}
+						else
+						{
+							currButton.setBackgroundDrawable(getResources().getDrawable(R.drawable.hint_gray_2));
+						}
+					}
+					else
+					{
+						if ((i+j) % 2 == 0) https://github.com/tneller/jump-maze-android.git
+						{
+							currButton.setBackgroundDrawable(getResources().getDrawable(R.drawable.black_2));
+						}
+						else
+						{
+							currButton.setBackgroundDrawable(getResources().getDrawable(R.drawable.gray_2));
+						}
+					}
 				}
+				//3
 				else if(currNode.key == 3)
 				{
-					currButton.setText("3");
-					currButton.setTextColor(Color.rgb(30, 100, 255));
-					currButton.setTextSize(getResources().getDimension(R.dimen.text_size));
+					if(currNode == playerNode)
+					{
+						if ((i+j) % 2 == 0) 
+						{
+							currButton.setBackgroundDrawable(getResources().getDrawable(R.drawable.selected_black_3));
+						}
+						else
+						{
+							currButton.setBackgroundDrawable(getResources().getDrawable(R.drawable.selected_gray_3));
+						}
+					}
+					else if(currNode.visited == true)
+					{
+						if ((i+j) % 2 == 0) 
+						{
+							currButton.setBackgroundDrawable(getResources().getDrawable(R.drawable.hint_black_3));
+						}
+						else
+						{
+							currButton.setBackgroundDrawable(getResources().getDrawable(R.drawable.hint_gray_3));
+						}
+					}
+					else
+					{
+						if ((i+j) % 2 == 0) https://github.com/tneller/jump-maze-android.git
+						{
+							currButton.setBackgroundDrawable(getResources().getDrawable(R.drawable.black_3));
+						}
+						else
+						{
+							currButton.setBackgroundDrawable(getResources().getDrawable(R.drawable.gray_3));
+						}
+					}
 				}
+				//4
 				else if(currNode.key == 4)
 				{
-					currButton.setText("4");
-					currButton.setTextColor(Color.GREEN);
-					currButton.setTextSize(getResources().getDimension(R.dimen.text_size));
+					if(currNode == playerNode)
+					{
+						if ((i+j) % 2 == 0) 
+						{
+							currButton.setBackgroundDrawable(getResources().getDrawable(R.drawable.selected_black_4));
+						}
+						else
+						{
+							currButton.setBackgroundDrawable(getResources().getDrawable(R.drawable.selected_gray_4));
+						}
+					}
+					else if(currNode.visited == true)
+					{
+						if ((i+j) % 2 == 0) 
+						{
+							currButton.setBackgroundDrawable(getResources().getDrawable(R.drawable.hint_black_4));
+						}
+						else
+						{
+							currButton.setBackgroundDrawable(getResources().getDrawable(R.drawable.hint_gray_4));
+						}
+					}
+					else
+					{
+						if ((i+j) % 2 == 0) https://github.com/tneller/jump-maze-android.git
+						{
+							currButton.setBackgroundDrawable(getResources().getDrawable(R.drawable.black_4));
+						}
+						else
+						{
+							currButton.setBackgroundDrawable(getResources().getDrawable(R.drawable.gray_4));
+						}
+					}
 				}
 				else
 				{
 					if ((i+j) % 2 == 0) {
-						currButton.setText("");
+						//currButton.setText("");
 						Drawable d = getResources().getDrawable(R.drawable.g_black);
 						currButton.setBackgroundDrawable(d);
-						currButton.setTextSize(getResources().getDimension(R.dimen.text_size));
+						//currButton.setTextSize(getResources().getDimension(R.dimen.text_size));
 					}
 					else {
-						currButton.setText("");
+						//currButton.setText("");
 						Drawable d = getResources().getDrawable(R.drawable.g_gray);
 						currButton.setBackgroundDrawable(d);
-						currButton.setTextSize(getResources().getDimension(R.dimen.text_size));
+						//currButton.setTextSize(getResources().getDimension(R.dimen.text_size));
 					}
 				}
-
 			}
 		}
 
@@ -323,185 +474,32 @@ public class MazeActivity extends Activity {
 		buttons[4][3] = (Button) findViewById(R.id.Button24);
 		buttons[4][4] = (Button) findViewById(R.id.Button25);
 
-		buttons[0][0].setOnClickListener(new View.OnClickListener() {
-			public void onClick(View v) {
-				int lastClickedRow=0;
-				int lastClickedCol=0;
-				makeMove(lastClickedRow, lastClickedCol);				
+		for(int i = 0; i < buttons.length; i++)
+		{
+			for(int j = 0; j < buttons.length; j++)
+			{
+				buttons[i][j].setOnClickListener(new MazeButtonListener(i,j));
 			}
-		});
-		buttons[0][1].setOnClickListener(new View.OnClickListener() {
-			public void onClick(View v) {
-				int lastClickedRow=0;
-				int lastClickedCol=1;
-				makeMove(lastClickedRow, lastClickedCol);
-			}
-		});
-		buttons[0][2].setOnClickListener(new View.OnClickListener() {
-			public void onClick(View v) {
-				int lastClickedRow=0;
-				int lastClickedCol=2;
-				makeMove(lastClickedRow, lastClickedCol);
-			}
-		});
-		buttons[0][3].setOnClickListener(new View.OnClickListener() {
-			public void onClick(View v) {
-				int lastClickedRow=0;
-				int lastClickedCol=3;
-				makeMove(lastClickedRow, lastClickedCol);
-			}
-		});
-		buttons[0][4].setOnClickListener(new View.OnClickListener() {
-			public void onClick(View v) {
-				int lastClickedRow=0;
-				int lastClickedCol=4;
-				makeMove(lastClickedRow, lastClickedCol);
-			}
-		});
+		}
 
-		buttons[1][0].setOnClickListener(new View.OnClickListener() {
-			public void onClick(View v) {
-				int lastClickedRow=1;
-				int lastClickedCol=0;
-				makeMove(lastClickedRow, lastClickedCol);
-			}
-		});
-		buttons[1][1].setOnClickListener(new View.OnClickListener() {
-			public void onClick(View v) {
-				int lastClickedRow=1;
-				int lastClickedCol=1;
-				makeMove(lastClickedRow, lastClickedCol);
-			}
-		});
-		buttons[1][2].setOnClickListener(new View.OnClickListener() {
-			public void onClick(View v) {
-				int lastClickedRow=1;
-				int lastClickedCol=2;
-				makeMove(lastClickedRow, lastClickedCol);
-			}
-		});
-		buttons[1][3].setOnClickListener(new View.OnClickListener() {
-			public void onClick(View v) {
-				int lastClickedRow=1;
-				int lastClickedCol=3;
-				makeMove(lastClickedRow, lastClickedCol);
-			}
-		});
-		buttons[1][4].setOnClickListener(new View.OnClickListener() {
-			public void onClick(View v) {
-				int lastClickedRow=1;
-				int lastClickedCol=4;
-				makeMove(lastClickedRow, lastClickedCol);
-			}
-		});
+	}
 
-		buttons[2][0].setOnClickListener(new View.OnClickListener() {
-			public void onClick(View v) {
-				int lastClickedRow=2;
-				int lastClickedCol=0;
-				makeMove(lastClickedRow, lastClickedCol);
-			}
-		});
-		buttons[2][1].setOnClickListener(new View.OnClickListener() {
-			public void onClick(View v) {
-				int lastClickedRow=2;
-				int lastClickedCol=1;
-				makeMove(lastClickedRow, lastClickedCol);
-			}
-		});
-		buttons[2][2].setOnClickListener(new View.OnClickListener() {
-			public void onClick(View v) {
-				int lastClickedRow=2;
-				int lastClickedCol=2;
-				makeMove(lastClickedRow, lastClickedCol);
-			}
-		});
-		buttons[2][3].setOnClickListener(new View.OnClickListener() {
-			public void onClick(View v) {
-				int lastClickedRow=2;
-				int lastClickedCol=3;
-				makeMove(lastClickedRow, lastClickedCol);
-			}
-		});
-		buttons[2][4].setOnClickListener(new View.OnClickListener() {
-			public void onClick(View v) {
-				int lastClickedRow=2;
-				int lastClickedCol=4;
-				makeMove(lastClickedRow, lastClickedCol);
-			}
-		});
+	private class MazeButtonListener implements View.OnClickListener
+	{
+		int row;
+		int col;
 
-		buttons[3][0].setOnClickListener(new View.OnClickListener() {
-			public void onClick(View v) {
-				int lastClickedRow=3;
-				int lastClickedCol=0;
-				makeMove(lastClickedRow, lastClickedCol);
-			}
-		});
-		buttons[3][1].setOnClickListener(new View.OnClickListener() {
-			public void onClick(View v) {
-				int lastClickedRow=3;
-				int lastClickedCol=1;
-				makeMove(lastClickedRow, lastClickedCol);
-			}
-		});
-		buttons[3][2].setOnClickListener(new View.OnClickListener() {
-			public void onClick(View v) {
-				int lastClickedRow=3;
-				int lastClickedCol=2;
-				makeMove(lastClickedRow, lastClickedCol);
-			}
-		});
-		buttons[3][3].setOnClickListener(new View.OnClickListener() {
-			public void onClick(View v) {
-				int lastClickedRow=3;
-				int lastClickedCol=3;
-				makeMove(lastClickedRow, lastClickedCol);
-			}
-		});
-		buttons[3][4].setOnClickListener(new View.OnClickListener() {
-			public void onClick(View v) {
-				int lastClickedRow=3;
-				int lastClickedCol=4;
-				makeMove(lastClickedRow, lastClickedCol);
-			}
-		});
+		public MazeButtonListener(int row, int col)
+		{
+			this.row = row;
+			this.col = col;
+		}
 
-		buttons[4][0].setOnClickListener(new View.OnClickListener() {
-			public void onClick(View v) {
-				int lastClickedRow=4;
-				int lastClickedCol=0;
-				makeMove(lastClickedRow, lastClickedCol);
-			}
-		});
-		buttons[4][1].setOnClickListener(new View.OnClickListener() {
-			public void onClick(View v) {
-				int lastClickedRow=4;
-				int lastClickedCol=1;
-				makeMove(lastClickedRow, lastClickedCol);
-			}
-		});
-		buttons[4][2].setOnClickListener(new View.OnClickListener() {
-			public void onClick(View v) {
-				int lastClickedRow=4;
-				int lastClickedCol=2;
-				makeMove(lastClickedRow, lastClickedCol);
-			}
-		});
-		buttons[4][3].setOnClickListener(new View.OnClickListener() {
-			public void onClick(View v) {
-				int lastClickedRow=4;
-				int lastClickedCol=3;
-				makeMove(lastClickedRow, lastClickedCol);
-			}
-		});
-		buttons[4][4].setOnClickListener(new View.OnClickListener() {
-			public void onClick(View v) {
-				int lastClickedRow=4;
-				int lastClickedCol=4;
-				makeMove(lastClickedRow, lastClickedCol);
-			}
-		});
+		@Override
+		public void onClick(View v) {
+			makeMove(row, col);
+		}
+
 	}
 
 }
